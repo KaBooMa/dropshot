@@ -77,17 +77,6 @@ def print_results(results, columns):
         print(', '.join(result_values))
 
 
-def print_sizes():
-    for size in get_sizes():
-        slug = size['slug']
-        price_hourly = size['price_hourly']
-        price_monthly = size['price_monthly']
-        memory = size['memory']
-        vcpus = size['vcpus']
-        disk = size['disk']
-        print('ID: %s, Hourly Price: %s, Monthly Price: %s, Memory: %sGB, vCores: %s, Disk: %sGB' % (slug, round(price_hourly, 2), round(price_monthly, 2), memory/1024, vcpus, disk))
-    
-
 def create_droplet(size, image_id):
     print('Creating droplet...')
     droplet_info = {
@@ -102,7 +91,6 @@ def create_droplet(size, image_id):
     }
     response = requests.post('https://api.digitalocean.com/v2/droplets', headers=headers, data=droplet_info)
     data = response.json()
-    print(data)
 
 
 def managed_ipv4():
@@ -121,6 +109,7 @@ def get_snapshots():
     print('Collecting snapshot data...')
     response = requests.get('https://api.digitalocean.com/v2/snapshots', headers=headers)
     data = response.json()
+    print(data)
     if 'snapshots' in data:
         return data['snapshots']
 
@@ -167,7 +156,8 @@ def spin_down():
 
 
 def spin_up():
-    print_sizes()
+    sizes = get_sizes()
+    print_results(sizes, ['slug', 'price_monthly', 'vcpus', 'memory', 'disk'])
     size = input(f'Which size would you prefer? [default: {config.default_size}]: ')
     if size == '':
         size = config.default_size
